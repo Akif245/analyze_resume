@@ -1,9 +1,11 @@
 import argparse
-import cgi
 import html
 import json
 import os
+from email.parser import BytesParser
+from email.policy import default
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import parse_qs
 
 from analyzer import analyze_resume, analyze_resume_file_bytes
 
@@ -703,29 +705,59 @@ def render_home(result: dict | None = None, message: str = "", error: str = "") 
     return page_template(content)
 
 
+def parse_post_data(handler: BaseHTTPRequestHandler) -> tuple[dict, dict]:
+    content_type = handler.headers.get("Content-Type", "")
+    content_length = int(handler.headers.get("Content-Length", "0") or "0")
+    raw_body = handler.rfile.read(content_length) if content_length > 0 else b""
+
+    fields: dict[str, str] = {}
+    files: dict[str, dict] = {}
+
+    if "multipart/form-data" in content_type:
+        message = BytesParser(policy=default).parsebytes(
+            f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + raw_body
+        )
+        for part in message.iter_parts():
+            disposition = part.get("Content-Disposition", "")
+            if "form-data" not in disposition:
+                continue
+
+            name = part.get_param("name", header="content-disposition")
+            if not name:
+                continue
+
+            filename = part.get_filename()
+            payload = part.get_payload(decode=True) or b""
+
+            if filename:
+                files[name] = {"filename": filename, "content": payload}
+            else:
+                charset = part.get_content_charset() or "utf-8"
+                fields[name] = payload.decode(charset, errors="ignore")
+
+    elif "application/x-www-form-urlencoded" in content_type:
+        parsed = parse_qs(raw_body.decode("utf-8", errors="ignore"))
+        fields = {key: values[0] for key, values in parsed.items()}
+
+    return fields, files
+
+
 class ResumeAppHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         self.respond_html(render_home())
 
     def do_POST(self) -> None:
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={
-                "REQUEST_METHOD": "POST",
-                "CONTENT_TYPE": self.headers.get("Content-Type", ""),
-            },
-        )
-
-        uploaded = form["resume_file"] if "resume_file" in form else None
-        resume_text = form.getfirst("resume_text", "")
-        job_description = form.getfirst("job_description", "")
+        fields, files = parse_post_data(self)
+        uploaded = files.get("resume_file")
+        resume_text = fields.get("resume_text", "")
+        job_description = fields.get("job_description", "")
 
         try:
-            if uploaded is not None and getattr(uploaded, "filename", ""):
-                raw_bytes = uploaded.file.read()
-                result = analyze_resume_file_bytes(raw_bytes, uploaded.filename, job_description)
-                page = render_home(result=result, message=f"Analysis completed for {uploaded.filename}.")
+            if uploaded is not None and uploaded.get("filename"):
+                raw_bytes = uploaded["content"]
+                filename = uploaded["filename"]
+                result = analyze_resume_file_bytes(raw_bytes, filename, job_description)
+                page = render_home(result=result, message=f"Analysis completed for {filename}.")
             elif resume_text.strip():
                 result = analyze_resume(resume_text, job_description)
                 page = render_home(result=result, message="Analysis completed from pasted resume text.")

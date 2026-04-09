@@ -52,6 +52,9 @@ Tasks Completed
    - Added `render.yaml`
    - Added `.gitignore`
    - Updated README with Render deployment instructions
+17. Fixed Python 3.13+ compatibility for deployment:
+   - Removed dependency on the deleted `cgi` module
+   - Replaced form parsing with a standard-library multipart parser
 
 Files Added
 1. analyzer.py
