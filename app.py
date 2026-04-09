@@ -2,6 +2,7 @@ import argparse
 import cgi
 import html
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from analyzer import analyze_resume, analyze_resume_file_bytes
@@ -749,8 +750,17 @@ class ResumeAppHandler(BaseHTTPRequestHandler):
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the local Resume Analyzer web UI.")
-    parser.add_argument("--host", default="127.0.0.1", help="Host to bind the local server.")
-    parser.add_argument("--port", type=int, default=8000, help="Port to bind the local server.")
+    parser.add_argument(
+        "--host",
+        default=os.getenv("HOST", "127.0.0.1"),
+        help="Host to bind the local server.",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.getenv("PORT", "8000")),
+        help="Port to bind the local server.",
+    )
     args = parser.parse_args()
 
     server = ThreadingHTTPServer((args.host, args.port), ResumeAppHandler)

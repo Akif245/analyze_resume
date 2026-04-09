@@ -31,6 +31,8 @@ Custom host or port:
 python app.py --host 127.0.0.1 --port 8001
 ```
 
+The app also reads `HOST` and `PORT` environment variables automatically, which makes it deployment-friendly for Render.
+
 ## Run The CLI
 
 Analyze a resume from a file:
@@ -70,3 +72,30 @@ python analyzer.py --resume-text "John Doe`nEmail: john@example.com" --jd-text "
 ```powershell
 pip install pypdf
 ```
+
+## Deploy On Render
+
+This project is now prepared for Render deployment.
+
+Files added for deployment:
+
+- `requirements.txt`
+- `render.yaml`
+
+Basic Render flow:
+
+1. Push this project to GitHub.
+2. In Render, create a new web service from the GitHub repo.
+3. Render can detect `render.yaml`, or you can manually use:
+
+```text
+Build Command: pip install -r requirements.txt
+Start Command: python app.py --host 0.0.0.0 --port $PORT
+```
+
+4. Deploy and open the generated Render URL.
+
+Notes:
+
+- The app uses local in-memory processing only and does not require a database.
+- PDF upload works in deployment because `pypdf` is included in `requirements.txt`.

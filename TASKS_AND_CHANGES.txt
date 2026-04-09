@@ -1,5 +1,5 @@
 Project: AI Resume Analyzer
-Date: 2026-04-09
+Date: 2026-04-10
 
 Tasks Completed
 1. Checked the target folder and confirmed it was empty.
@@ -46,12 +46,21 @@ Tasks Completed
    - Removed overflow rules that could hide content
    - Improved raw JSON wrapping and scroll behavior
    - Added stronger min-width protection for nested cards and sections
+16. Prepared the app for Render deployment:
+   - Added environment-based host and port handling
+   - Added `requirements.txt`
+   - Added `render.yaml`
+   - Added `.gitignore`
+   - Updated README with Render deployment instructions
 
 Files Added
 1. analyzer.py
 2. app.py
 3. README.md
 4. TASKS_AND_CHANGES.txt
+5. requirements.txt
+6. render.yaml
+7. .gitignore
 
 Implementation Notes
 - The analyzer uses heuristic parsing to work on incomplete or poorly formatted resumes.
@@ -63,7 +72,7 @@ Implementation Notes
 - PDF parsing is optional because the local environment may not have `pypdf` installed yet.
 
 Pending / Optional Future Improvements
-1. Add PDF and DOCX parsing support.
-2. Add a web UI.
-3. Add unit tests with real resume samples.
-4. Improve date parsing for more resume formats.
+1. Add unit tests with real resume samples.
+2. Improve date parsing for more resume formats.
+3. Improve mobile UI polish further.
+4. Add export/download support for analysis results.
