@@ -1,0 +1,69 @@
+Project: AI Resume Analyzer
+Date: 2026-04-09
+
+Tasks Completed
+1. Checked the target folder and confirmed it was empty.
+2. Created a new Python-based resume analyzer from scratch.
+3. Implemented strict JSON output matching the requested schema.
+4. Added resume parsing for:
+   - Basic info extraction
+   - Skills extraction by category
+   - Experience analysis
+   - Project analysis
+   - Education extraction
+   - ATS score generation
+   - Job match analysis
+   - Strengths and weaknesses
+   - Improvement suggestions
+   - Red flag detection
+   - Final verdict generation
+5. Added edge-case handling for:
+   - Empty resume input
+   - Very short resumes
+   - Missing sections
+   - Missing contact info
+   - Duplicate and messy formatting scenarios
+6. Added a README with usage examples.
+7. Prepared the project for command-line use with optional file input, direct text input, job description input, and JSON file output.
+8. Ran local verification with sample resume data.
+9. Fixed parser issues found during verification:
+   - Prevented skill lines from being misread as location
+   - Improved project header detection for single-line project entries
+   - Preserved inline project descriptions after the project title
+   - Normalized tool names like Git and GitHub more cleanly
+10. Added a local web UI for resume upload and structured result viewing.
+11. Added file extraction support for uploaded `.txt` and `.docx` resumes.
+12. Added optional `.pdf` extraction support through the `pypdf` package.
+13. Updated documentation with UI launch instructions and PDF notes.
+14. Improved UI responsiveness for smaller screens and narrow windows:
+   - Reduced layout pressure at tablet sizes
+   - Added safer text wrapping for long values and links
+   - Stacked action buttons on small screens
+   - Made chips and metric cards adapt better on mobile
+   - Reduced padding and typography scale for compact displays
+15. Fixed UI clipping on narrow responsive widths:
+   - Replaced fragile container width rules with safer max-width and padding
+   - Removed overflow rules that could hide content
+   - Improved raw JSON wrapping and scroll behavior
+   - Added stronger min-width protection for nested cards and sections
+
+Files Added
+1. analyzer.py
+2. app.py
+3. README.md
+4. TASKS_AND_CHANGES.txt
+
+Implementation Notes
+- The analyzer uses heuristic parsing to work on incomplete or poorly formatted resumes.
+- It avoids unsupported hallucinations by returning null or cautious summaries where details are missing.
+- ATS scoring is weighted across formatting, keyword usage, skills, projects, and experience.
+- Job matching is optional and activates only when a job description is provided.
+- Verification was completed with a sample resume using the local Python runtime.
+- The UI runs fully locally in the browser and does not require an external service.
+- PDF parsing is optional because the local environment may not have `pypdf` installed yet.
+
+Pending / Optional Future Improvements
+1. Add PDF and DOCX parsing support.
+2. Add a web UI.
+3. Add unit tests with real resume samples.
+4. Improve date parsing for more resume formats.
